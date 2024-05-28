@@ -1,0 +1,65 @@
+# Go-related files
+bin/
+pkg/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# Logs
+*.log
+
+# Database migrations
+migrations/
+
+# Configuration files
+.env
+
+# IDE/editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.iml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build output
+build/
+
+# Coverage reports
+coverage.out
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.old
+*.swp
+*~
+
+# Docker-related files
+docker-compose.override.yml
+Dockerfile.local
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+*.log
+
+# Security
+secrets/
