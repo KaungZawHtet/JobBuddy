@@ -2,9 +2,9 @@ package main
 
 import (
 	"JobBuddy/config"
-	"github.com/gin-gonic/gin"
+
+	"JobBuddy/models/domain"
 	"github.com/joho/godotenv"
-	"net/http"
 )
 
 func main() {
@@ -13,7 +13,6 @@ func main() {
 	if errEnvLoading != nil {
 		panic("Error loading .env file")
 	}
-
 	db, errAccessDB := config.AcessDB()
 
 	if errAccessDB != nil {
@@ -21,23 +20,9 @@ func main() {
 		panic(errAccessDB.Error())
 	}
 
-	// Initialize Gin router
+	// Enable uuid-ossp extension
+	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
-	router := gin.Default()
-
-	// Define routes
-
-	router.GET("/", func(c *gin.Context) {
-
-		c.JSON(http.StatusOK, gin.H{
-
-			"message": db,
-		})
-
-	})
-
-	// Start the server
-
-	router.Run(":8080")
+	db.AutoMigrate(&domain.User{})
 
 }
