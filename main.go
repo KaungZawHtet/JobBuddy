@@ -3,9 +3,10 @@ package main
 import (
 	"JobBuddy/config"
 	"JobBuddy/handlers"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"net/http"
 )
 
 func main() {
@@ -45,6 +46,6 @@ func main() {
 
 	// Start the server
 
-	router.Run(":8080")
+	router.Run(":80")
 
 }
