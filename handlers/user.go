@@ -95,6 +95,16 @@ func HandleRegister(context *gin.Context) {
 
 	}
 
+	_, errorEmail := services.SendEmailConfirmationLink(newUser.Email, emailToken)
+
+	if errorEmail != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": errorEmail.Error(),
+		})
+
+		return
+	}
+
 	context.JSON(http.StatusAccepted, gin.H{
 		"message": "Check your email",
 		"data":    newUser,
