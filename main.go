@@ -2,6 +2,7 @@ package main
 
 import (
 	"JobBuddy/config"
+	"JobBuddy/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"net/http"
@@ -35,6 +36,12 @@ func main() {
 		})
 
 	})
+
+	userApiGroup := router.Group("/api/user")
+	{
+		userApiGroup.POST("/register", handlers.HandleRegister)
+
+	}
 
 	// Start the server
 
