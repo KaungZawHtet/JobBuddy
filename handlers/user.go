@@ -7,6 +7,7 @@ import (
 	"JobBuddy/models/domain"
 	"JobBuddy/models/dto"
 	"JobBuddy/services"
+	"JobBuddy/types"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
@@ -33,7 +34,7 @@ func HandleRegister(context *gin.Context) {
 		return
 	}
 
-	checkedUser, _ := services.GetUserByEmail(userRegistration.Email)
+	checkedUser, _ := services.GetUser(types.ByEmail, userRegistration.Email)
 
 	if checkedUser != nil && checkedUser.ID.String() != "" {
 
@@ -109,5 +110,20 @@ func HandleRegister(context *gin.Context) {
 		"message": "Check your email",
 		"data":    newUser,
 	})
+
+}
+
+func HandleEmailConfirmation(context *gin.Context) {
+
+	token := context.Query("token")
+
+	checkedUser, _ := services.GetUser(types.ByEmailToken, token)
+
+	if checkedUser != nil && checkedUser.EmailConfirmationToken == "" {
+
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": "Error at confirmation",
+		})
+	}
 
 }

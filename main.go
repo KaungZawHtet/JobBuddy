@@ -1,7 +1,6 @@
 package main
 
 import (
-	"JobBuddy/config"
 	"JobBuddy/handlers"
 	"net/http"
 
@@ -16,24 +15,17 @@ func main() {
 		panic("Error loading .env file")
 	}
 
-	db, errAccessDB := config.AcessDB()
-
-	if errAccessDB != nil {
-
-		panic(errAccessDB.Error())
-	}
-
 	// Initialize Gin router
 
 	router := gin.Default()
 
 	// Define routes
 
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/ping", func(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{
 
-			"message": db,
+			"message": "pong",
 		})
 
 	})

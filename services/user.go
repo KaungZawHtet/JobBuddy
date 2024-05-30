@@ -3,9 +3,12 @@ package services
 import (
 	"JobBuddy/config"
 	"JobBuddy/models/domain"
+	"JobBuddy/types"
+
+	"gorm.io/gorm"
 )
 
-func GetUserByEmail(email string) (*domain.User, error) {
+func GetUser(field types.Field, value string) (*domain.User, error) {
 
 	var user domain.User
 	db, errDbAccess := config.AcessDB()
@@ -16,7 +19,21 @@ func GetUserByEmail(email string) (*domain.User, error) {
 
 	}
 
-	result := db.Where("email = ?", email).First(&user)
+	var result *gorm.DB
+
+	switch field {
+	case types.ByID:
+		result = db.Where("id = ?", value).First(&user)
+		break
+	case types.ByEmail:
+		result = db.Where("email = ?", value).First(&user)
+		break
+
+	case types.ByEmailToken:
+		result = db.Where("email_confirmation_token = ?", value).First(&user)
+		break
+
+	}
 
 	if result.Error != nil {
 
@@ -40,6 +57,26 @@ func CreateUser(user *domain.User) error {
 	}
 
 	result := db.Create(user)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+
+}
+
+func UpdateUser(user *domain.User) error {
+
+	db, errDbAccess := config.AcessDB()
+
+	if errDbAccess != nil {
+
+		return errDbAccess
+
+	}
+
+	result := db.Save(user)
 
 	if result.Error != nil {
 		return result.Error

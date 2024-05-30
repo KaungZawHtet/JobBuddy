@@ -22,15 +22,14 @@ func SendEmailConfirmationLink(email, emailToken string) (bool, error) {
 	subject := "Email Confirmation"
 
 	message := mg.NewMessage(sender, subject, "", email)
-	body := `
+	body := fmt.Sprintf(`
 <html>
 <body>
-	<h1>Sending HTML emails with Mailgun</h1>
-	<p style="color:blue; font-size:30px;">Hello world</p>
-	<p style="font-size:30px;">More examples can be found <a href="https://documentation.mailgun.com/en/latest/api-sending.html#examples">here</a></p>
+	<h1>Hello, Please confirm your email</h1>
+	<a href="http://localhost:8080/api/user/email-confirm">Here </a>
 </body>
 </html>
-`
+`)
 
 	message.SetHtml(body)
 
