@@ -14,6 +14,7 @@ type User struct {
 	LastName               string    `gorm:"type:varchar(100)"`
 	Email                  string    `gorm:"type:varchar(100);uniqueIndex;not null"`
 	EmailConfirmationToken string
+	EmailConfirmed         bool
 	Password               string
 	CreatedAt              time.Time
 	UpdatedAt              time.Time

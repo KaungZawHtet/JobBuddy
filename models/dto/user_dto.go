@@ -8,3 +8,9 @@ type UserRegistration struct {
 	Email        string `json:"email" binding:"required,email"`
 	EmailRecheck string `json:"email_recheck" binding:"required,email"`
 }
+
+type UserLogin struct {
+	Password   string `json:"password" binding:"required"`
+	Email      string `json:"email" binding:"required,email"`
+	RememberMe bool   `json:"remember_me" binding:"required"`
+}

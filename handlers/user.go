@@ -8,8 +8,9 @@ import (
 	"JobBuddy/models/dto"
 	"JobBuddy/services"
 	"JobBuddy/types"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func HandleRegister(context *gin.Context) {
@@ -124,6 +125,69 @@ func HandleEmailConfirmation(context *gin.Context) {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"message": "Error at confirmation",
 		})
+
+		return
 	}
+
+	checkedUser.EmailConfirmed = true
+
+	services.UpdateUser(checkedUser)
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Email Confirmed! Please Log in with your email",
+	})
+
+}
+
+func HandleLogin(context *gin.Context) {
+
+	var loginForm dto.UserLogin
+
+	errBindJsong := context.ShouldBindJSON(&loginForm)
+
+	if errBindJsong != nil {
+
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message": errBindJsong.Error(),
+		})
+		return
+	}
+
+	checkedUser, _ := services.GetUser(types.ByEmail, loginForm.Email)
+
+	if checkedUser != nil && checkedUser.Email == "" {
+
+		context.JSON(http.StatusNotFound, gin.H{
+			"message": "User not found",
+		})
+		return
+
+	}
+
+	errCompare := bcrypt.CompareHashAndPassword([]byte(checkedUser.Password), []byte(loginForm.Password))
+
+	if errCompare != nil {
+
+		context.JSON(http.StatusForbidden, gin.H{
+			"message": "Invalid Email or Password",
+		})
+		return
+	}
+
+	token, err := services.GenerateJWTToken(loginForm)
+
+	if err != nil {
+
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+
+	}
+
+	context.JSON(http.StatusInternalServerError, gin.H{
+		"message": "Token can't be created",
+		"token":   token,
+	})
 
 }

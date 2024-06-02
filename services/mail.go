@@ -17,19 +17,22 @@ func SendEmailConfirmationLink(email, emailToken string) (bool, error) {
 	apiKey := os.Getenv("MAILGUN_API_KEY")
 	sender := fmt.Sprintf("JobBuddy<contact@%s>", domain)
 
+	baseUrl := os.Getenv("BASE_URL")
+
 	mg := mailgun.NewMailgun(domain, apiKey)
 
 	subject := "Email Confirmation"
 
 	message := mg.NewMessage(sender, subject, "", email)
+	link := fmt.Sprintf("Please confirm your email by clicking on the following link: \n%s/api/user/email-confirm?token=%s", baseUrl, emailToken)
 	body := fmt.Sprintf(`
 <html>
 <body>
-	<h1>Hello, Please confirm your email</h1>
-	<a href="http://localhost:8080/api/user/email-confirm">Here </a>
+	<h1>Hello, Please confirm your email</h1><br>
+	%s
 </body>
 </html>
-`)
+`, link)
 
 	message.SetHtml(body)
 

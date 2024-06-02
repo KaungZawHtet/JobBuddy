@@ -33,11 +33,13 @@ func main() {
 	userApiGroup := router.Group("/api/user")
 	{
 		userApiGroup.POST("/register", handlers.HandleRegister)
+		userApiGroup.GET("/email-confirm", handlers.HandleEmailConfirmation)
+		userApiGroup.POST("/login", handlers.HandleLogin)
 
 	}
 
 	// Start the server
 
-	router.Run(":80")
+	router.Run(":8080")
 
 }
