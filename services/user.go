@@ -6,11 +6,11 @@ import (
 	"JobBuddy/models/dto"
 	"JobBuddy/types"
 
-	"os"
-	"time"
-
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
+	"os"
+	"time"
 )
 
 func GetUser(field types.Field, value string) (*domain.User, error) {
@@ -119,5 +119,32 @@ func GenerateJWTToken(dto dto.UserLogin) (string, error) {
 	}
 
 	return tokenString, nil
+
+}
+
+func ValidateJWTToken(tokenString string) (jwt.MapClaims, bool, error) {
+
+	// Parse takes the token string and a function for looking up the key. The latter is especially
+	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
+	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
+	// to the callback, providing flexibility.
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		secret := []byte(os.Getenv("JWT_SECRET"))
+
+		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		return secret, nil
+	})
+	if err != nil {
+		return nil, false, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	return claims, ok, nil
 
 }

@@ -2,10 +2,10 @@ package main
 
 import (
 	"JobBuddy/handlers"
-	"net/http"
-
+	"JobBuddy/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"net/http"
 )
 
 func main() {
@@ -35,6 +35,8 @@ func main() {
 		userApiGroup.POST("/register", handlers.HandleRegister)
 		userApiGroup.GET("/email-confirm", handlers.HandleEmailConfirmation)
 		userApiGroup.POST("/login", handlers.HandleLogin)
+
+		userApiGroup.GET("/claims-checker", middlewares.Authenticator(), handlers.HandleClaimsChecker)
 
 	}
 

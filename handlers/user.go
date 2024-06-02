@@ -185,9 +185,30 @@ func HandleLogin(context *gin.Context) {
 
 	}
 
-	context.JSON(http.StatusInternalServerError, gin.H{
-		"message": "Token can't be created",
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
 		"token":   token,
+	})
+
+}
+
+func HandleClaimsChecker(context *gin.Context) {
+
+	mapClaims, exists := context.Get("mapClaims")
+
+	if !exists {
+
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "mapClaims not exists",
+		})
+		return
+
+	}
+
+	//email := mapClaims["email"]
+
+	context.JSON(http.StatusOK, gin.H{
+		"claims": mapClaims,
 	})
 
 }
