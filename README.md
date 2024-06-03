@@ -2,7 +2,7 @@
 
 ### Overview
 
-The JobBuddy API is a comprehensive backend service designed to assist software engineers in Bangkok with tracking job applications, managing job search progress, and accessing resources for job hunting. Built using Golang, Gin, and PostgreSQL, this API provides secure and efficient endpoints for job application management, company research, and job interview preparation.
+The JobBuddy API is a comprehensive backend service designed to assist software engineers in Bangkok with tracking job applications, managing job search progress, and accessing resources for job hunting. Built using Golang, Gin, and PostgreSQL, this API provides secure and efficient endpoints for job application management, company research, and job interview preparation. This can also be used a template/model project for your future golang project instead of writing everything from scratch.
 
 
 ### Features

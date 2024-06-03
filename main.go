@@ -19,6 +19,9 @@ func main() {
 
 	router := gin.Default()
 
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+
 	// Define routes
 
 	router.GET("/ping", func(c *gin.Context) {
