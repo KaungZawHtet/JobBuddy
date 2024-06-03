@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	//"github.com/go-playground/validator/v10"
 	//"JobBuddy/config"
@@ -8,9 +9,11 @@ import (
 	"JobBuddy/models/dto"
 	"JobBuddy/services"
 	"JobBuddy/types"
-	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"net/http"
+	"os"
 )
 
 func HandleRegister(context *gin.Context) {
@@ -209,6 +212,74 @@ func HandleClaimsChecker(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{
 		"claims": mapClaims,
+	})
+
+}
+
+func HandleGoogleAuth(context *gin.Context) {
+
+	clientId := os.Getenv("GOOGLE_AUTH_CLIENT_ID")
+	redirectUri := os.Getenv("GOOGLE_REDIRECT_URI")
+
+	url := fmt.Sprintf("https://accounts.google.com/o/oauth2/v2/auth?client_id=%s&redirect_uri=%s&response_type=code&scope=profile email", clientId, redirectUri)
+
+	fmt.Println(url)
+
+	context.Redirect(http.StatusMovedPermanently, url)
+
+}
+
+func HandleGoogleAuthCallback(context *gin.Context) {
+
+	code := context.Query("code")
+
+	googleToken, err := services.ExchangeCodeForGoogleToken(code)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange code for token"})
+		return
+	}
+
+	profile, err := services.FetchGoogleUserProfile(googleToken.AccessToken)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user profile"})
+		return
+	}
+
+	/////
+
+	checkedUser, _ := services.GetUser(types.ByEmail, profile.Email)
+
+	if checkedUser == nil || checkedUser.ID.String() == "" {
+		newUser := domain.User{
+			UserName:       profile.Name,
+			Email:          profile.Email,
+			EmailConfirmed: true,
+		}
+
+		errCreateUser := services.CreateUser(&newUser)
+		if errCreateUser != nil {
+			context.JSON(http.StatusAccepted, gin.H{
+				"message": errCreateUser.Error(),
+			})
+			return
+		}
+	}
+
+	jwtToken, err := services.GenerateJWTToken(dto.UserLogin{
+		Email:      profile.Email,
+		RememberMe: true,
+	})
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"token":   jwtToken,
 	})
 
 }

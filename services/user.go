@@ -5,12 +5,17 @@ import (
 	"JobBuddy/models/domain"
 	"JobBuddy/models/dto"
 	"JobBuddy/types"
-
+	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
-	"gorm.io/gorm"
+	"net/http"
 	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"gorm.io/gorm"
 )
 
 func GetUser(field types.Field, value string) (*domain.User, error) {
@@ -147,4 +152,43 @@ func ValidateJWTToken(tokenString string) (jwt.MapClaims, bool, error) {
 
 	return claims, ok, nil
 
+}
+
+func ExchangeCodeForGoogleToken(code string) (*oauth2.Token, error) {
+	conf := &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_AUTH_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_AUTH_CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URI"),
+		Endpoint:     google.Endpoint,
+	}
+
+	token, err := conf.Exchange(context.Background(), code)
+	if err != nil {
+		return nil, err
+	}
+
+	return token, nil
+}
+
+func FetchGoogleUserProfile(accessToken string) (dto.UserProfile, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v1/userinfo", nil)
+	if err != nil {
+		return dto.UserProfile{}, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return dto.UserProfile{}, err
+	}
+	defer resp.Body.Close()
+
+	var profile dto.UserProfile
+	if err := json.NewDecoder(resp.Body).Decode(&profile); err != nil {
+		return dto.UserProfile{}, err
+	}
+
+	return profile, nil
 }

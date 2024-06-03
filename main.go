@@ -35,6 +35,8 @@ func main() {
 		userApiGroup.POST("/register", handlers.HandleRegister)
 		userApiGroup.GET("/email-confirm", handlers.HandleEmailConfirmation)
 		userApiGroup.POST("/login", handlers.HandleLogin)
+		userApiGroup.GET("/google-auth", handlers.HandleGoogleAuth)
+		userApiGroup.GET("/google-auth-callback", handlers.HandleGoogleAuthCallback)
 
 		userApiGroup.GET("/claims-checker", middlewares.Authenticator(), handlers.HandleClaimsChecker)
 
