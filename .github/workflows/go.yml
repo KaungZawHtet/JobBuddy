@@ -14,25 +14,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:latest
-        ports:
-          - 5432:5432
-        env:
-          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install PostgreSQL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql postgresql-contrib
+
+    - name: Start PostgreSQL service
+      run: sudo service postgresql start
+
+    - name: Set up PostgreSQL user and database
+      run: |
+        sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DATABASE_NAME }} OWNER github_actions;"
+
+    - name: Set environment variables for PostgreSQL
+      run: |
+        echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> $GITHUB_ENV
+        echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $GITHUB_ENV
+        echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
+        echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> $GITHUB_ENV
+        echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
+
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        until pg_isready -h ${{ secrets.DATABASE_HOST }} -p 5432 -U ${{ secrets.DATABASE_USERNAME }}; do
+          echo "Waiting for PostgreSQL..."
+          sleep 1
+        done
+
+    - name: Install dependencies
+      run: go mod download
 
     - name: Set up Go
       uses: actions/setup-go@v4
