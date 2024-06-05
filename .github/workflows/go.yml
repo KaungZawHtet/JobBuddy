@@ -10,7 +10,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    environment: MyVars
+    environment: JobBuddyEnv
 
     env:
       DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
