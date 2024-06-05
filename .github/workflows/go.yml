@@ -32,6 +32,8 @@ jobs:
         echo "DATABASE_PORT=${DATABASE_PORT}" >> .env
         echo "ENVIRONMENT=${ENVIRONMENT}" >> .env
 
+    - name: Display .env file
+      run: cat .env
 
     - name: Install PostgreSQL
       run: |
