@@ -3,6 +3,7 @@
 package tests
 
 import (
+	"JobBuddy/models/domain"
 	"JobBuddy/services"
 	"JobBuddy/types"
 
@@ -33,6 +34,14 @@ func TestPingRoute(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
+
+	services.CreateUser(&domain.User{
+		Email:                  "kaungzawhtet.mm@gmail.com",
+		UserName:               "KZH",
+		Password:               "f23fjqvnqv2420tt14",
+		EmailConfirmed:         true,
+		EmailConfirmationToken: "ef20f4-qn4v4q3vjq3jvqj",
+	})
 
 	result, _ := services.GetUser(types.ByEmail, "kaungzawhtet.mm@gmail.com")
 
