@@ -8,8 +8,8 @@ import (
 	"JobBuddy/types"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/stretchr/testify/assert"
+	"os"
 
 	"JobBuddy/handlers"
 	"net/http"
@@ -35,13 +35,19 @@ func TestPingRoute(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 
-	services.CreateUser(&domain.User{
-		Email:                  "kaungzawhtet.mm@gmail.com",
-		UserName:               "KZH",
-		Password:               "f23fjqvnqv2420tt14",
-		EmailConfirmed:         true,
-		EmailConfirmationToken: "ef20f4-qn4v4q3vjq3jvqj",
-	})
+	env := os.Getenv("ENVIRONMENT")
+
+	if env == "test" {
+
+		services.CreateUser(&domain.User{
+			Email:                  "kaungzawhtet.mm@gmail.com",
+			UserName:               "KZH",
+			Password:               "f23fjqvnqv2420tt14",
+			EmailConfirmed:         true,
+			EmailConfirmationToken: "ef20f4-qn4v4q3vjq3jvqj",
+		})
+
+	}
 
 	result, _ := services.GetUser(types.ByEmail, "kaungzawhtet.mm@gmail.com")
 
