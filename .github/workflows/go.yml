@@ -26,7 +26,7 @@ jobs:
 
     - name: Set up PostgreSQL user and database
       run: |
-        sudo -u postgres psql -c "CREATE DATABASE job_buddy OWNER postgres;"
+        sudo -u postgres psql -c "CREATE DATABASE job_buddy;"
 
     - name: Set environment variables for PostgreSQL
       run: |
@@ -47,6 +47,9 @@ jobs:
 
     - name: Build
       run: go build -v ./...
+
+    - name: Migrate
+      run: go run ./cmd/migration/
 
     - name: Test
       run: go test -v ./tests/...
