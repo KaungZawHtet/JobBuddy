@@ -11,10 +11,10 @@ func main() {
 
 	println("Hello From Migration")
 
-	errEnvLoading := godotenv.Load()
-	if errEnvLoading != nil {
+	godotenv.Load()
+	/* if errEnvLoading != nil {
 		panic("Error loading .env file")
-	}
+	} */
 	db, errAccessDB := config.AcessDB()
 
 	if errAccessDB != nil {
