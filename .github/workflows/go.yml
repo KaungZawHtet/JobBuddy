@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Go
 
 on:
@@ -13,8 +10,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-
-
 
     steps:
     - uses: actions/checkout@v4
@@ -29,7 +24,7 @@ jobs:
 
     - name: Set up PostgreSQL user and database
       run: |
-        sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DATABASE_NAME }} OWNER github_actions;"
+        sudo -u postgres psql -c "CREATE DATABASE ${DATABASE_NAME} OWNER ${DATABASE_USERNAME};"
 
     - name: Set environment variables for PostgreSQL
       run: |
@@ -41,7 +36,7 @@ jobs:
 
     - name: Wait for PostgreSQL to be ready
       run: |
-        until pg_isready -h ${{ secrets.DATABASE_HOST }} -p 5432 -U ${{ secrets.DATABASE_USERNAME }}; do
+        until pg_isready -h ${{ secrets.DATABASE_HOST }} -p ${{ secrets.DATABASE_PORT }} -U ${{ secrets.DATABASE_USERNAME }}; do
           echo "Waiting for PostgreSQL..."
           sleep 1
         done
