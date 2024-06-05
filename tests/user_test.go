@@ -5,35 +5,21 @@ package tests
 import (
 	"JobBuddy/services"
 	"JobBuddy/types"
+
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+
 	"github.com/stretchr/testify/assert"
-	"log"
+
+	"JobBuddy/handlers"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
-
-func TestMain(m *testing.M) {
-	// Load the .env file
-	godotenv.Load()
-
-	// Run the tests
-	code := m.Run()
-
-	// Exit with the test code
-	os.Exit(code)
-}
 
 func TestPingRoute(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	router.GET("/ping", handlers.HandlePing)
 
 	req, err := http.NewRequest(http.MethodGet, "/ping", nil)
 	assert.NoError(t, err)
