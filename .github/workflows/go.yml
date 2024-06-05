@@ -23,6 +23,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Create .env file
+      run: |
+        echo "DATABASE_NAME=${DATABASE_NAME}" >> .env
+        echo "DATABASE_USERNAME=${DATABASE_USERNAME}" >> .env
+        echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}" >> .env
+        echo "DATABASE_HOST=${DATABASE_HOST}" >> .env
+        echo "DATABASE_PORT=${DATABASE_PORT}" >> .env
+        echo "ENVIRONMENT=${ENVIRONMENT}" >> .env
+
+
     - name: Install PostgreSQL
       run: |
         sudo apt-get update
@@ -60,3 +70,6 @@ jobs:
 
     - name: Test
       run: go test -v ./tests/...
+
+    - name: Stop PostgreSQL service
+      run: sudo service postgresql stop
