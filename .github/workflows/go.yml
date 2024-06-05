@@ -19,7 +19,6 @@ jobs:
       DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
       DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
 
-
     steps:
     - uses: actions/checkout@v4
 
@@ -31,19 +30,16 @@ jobs:
     - name: Start PostgreSQL service
       run: sudo service postgresql start
 
-
-    - name: Set up PostgreSQL user and database
+    - name: Wait for PostgreSQL to be ready
       run: |
-        sudo -u postgres psql -c "CREATE DATABASE job_buddy;"
+        until pg_isready --host=$DATABASE_HOST --port=$DATABASE_PORT --username=$DATABASE_USERNAME; do
+          sleep 1
+        done
 
-    - name: Set environment variables for PostgreSQL
+    - name: Set up PostgreSQL database
       run: |
-        echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> $GITHUB_ENV
-        echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $GITHUB_ENV
-        echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> $GITHUB_ENV
-        echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> $GITHUB_ENV
-        echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
-
+        sudo -u postgres psql -c "CREATE DATABASE $DATABASE_NAME;"
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DATABASE_NAME TO $DATABASE_USERNAME;"
 
     - name: Install dependencies
       run: go mod download
