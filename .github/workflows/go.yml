@@ -36,17 +36,6 @@ jobs:
         echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> $GITHUB_ENV
         echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
 
-    - name: Wait for PostgreSQL to be ready
-      env:
-        DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-        DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-        DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-      run: |
-        echo "Checking PostgreSQL readiness on host $DATABASE_HOST, port $DATABASE_PORT, with user $DATABASE_USERNAME"
-        until pg_isready -h job_buddy -p 5432 -U postgres; do
-          echo "Waiting for PostgreSQL..."
-          sleep 1
-        done
 
     - name: Install dependencies
       run: go mod download
