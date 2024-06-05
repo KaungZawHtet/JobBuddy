@@ -35,8 +35,13 @@ jobs:
         echo "DATABASE_PORT=${{ secrets.DATABASE_PORT }}" >> $GITHUB_ENV
 
     - name: Wait for PostgreSQL to be ready
+      env:
+        DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+        DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+        DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       run: |
-        until pg_isready -h ${{ secrets.DATABASE_HOST }} -p ${{ secrets.DATABASE_PORT }} -U ${{ secrets.DATABASE_USERNAME }}; do
+        echo "Checking PostgreSQL readiness on host $DATABASE_HOST, port $DATABASE_PORT, with user $DATABASE_USERNAME"
+        until pg_isready -h $DATABASE_HOST -p $DATABASE_PORT -U $DATABASE_USERNAME; do
           echo "Waiting for PostgreSQL..."
           sleep 1
         done
