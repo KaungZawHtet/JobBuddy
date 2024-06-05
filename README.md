@@ -81,6 +81,22 @@ go run main.go
 
 ```
 
+### Useful Tools
+
+1. To run test
+
+```bash
+go test ./tests/... -v
+
+```
+
+2. To run migration
+
+```bash
+go run ./cmd/migration/
+
+```
+
 
 ### API Endpoints
 
