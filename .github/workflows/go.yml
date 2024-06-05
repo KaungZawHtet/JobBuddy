@@ -40,7 +40,7 @@ jobs:
       run: |
         sudo -u postgres psql -c "CREATE DATABASE $DATABASE_NAME;"
         sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DATABASE_NAME TO $DATABASE_USERNAME;"
-        sudo -u postgres psql -c "ALTER USER $DATABASE_USERNAME PASSWORD $DATABASE_PASSWORD;"
+        sudo -u postgres psql -c "ALTER USER '$DATABASE_USERNAME' PASSWORD '$DATABASE_PASSWORD';"
 
 
     - name: Install dependencies
