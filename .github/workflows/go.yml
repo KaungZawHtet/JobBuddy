@@ -10,6 +10,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    environment: JobBuddyEnv
 
     steps:
     - uses: actions/checkout@v4
@@ -21,6 +22,14 @@ jobs:
 
     - name: Start PostgreSQL service
       run: sudo service postgresql start
+
+    - name: Debug GitHub secrets
+      run: |
+        echo "DATABASE_NAME: ${{ secrets.DATABASE_NAME }}"
+        echo "DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}"
+        echo "DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}"
+        echo "DATABASE_HOST: ${{ secrets.DATABASE_HOST }}"
+        echo "DATABASE_PORT: ${{ secrets.DATABASE_PORT }}"
 
     - name: Set up PostgreSQL user and database
       run: |
