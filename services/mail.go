@@ -24,7 +24,7 @@ func SendEmailConfirmationLink(email, emailToken string) (bool, error) {
 	subject := "Email Confirmation"
 
 	message := mg.NewMessage(sender, subject, "", email)
-	link := fmt.Sprintf("Please confirm your email by clicking on the following link: \n%s/api/user/email-confirm?token=%s", baseUrl, emailToken)
+	link := fmt.Sprintf("Please confirm your email by clicking on the following link: \n%s/api/users/email-confirm?token=%s", baseUrl, emailToken)
 	body := fmt.Sprintf(`
 <html>
 <body>

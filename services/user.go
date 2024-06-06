@@ -110,6 +110,7 @@ func GenerateJWTToken(dto dto.UserLogin) (string, error) {
 	// you would like it to contain.
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":    dto.Id,
 		"email": dto.Email,
 		"exp":   exp.Unix(),
 	})

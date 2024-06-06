@@ -3,9 +3,10 @@ package main
 import (
 	"JobBuddy/handlers"
 	"JobBuddy/middlewares"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"net/http"
 )
 
 func main() {
@@ -19,7 +20,6 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
 	// Define routes
@@ -48,7 +48,8 @@ func main() {
 	JobApplicationApiGroup := router.Group("/api/job-applications")
 	{
 
-		JobApplicationApiGroup.GET("/", middlewares.Authenticator(), handlers.HandleMyApplicationsList)
+		JobApplicationApiGroup.GET("", middlewares.Authenticator(), handlers.HandleMyApplicationsList)
+		JobApplicationApiGroup.POST("", middlewares.Authenticator(), handlers.HandleMyApplicationCreation)
 
 	}
 

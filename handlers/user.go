@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
+
 	//"github.com/go-playground/validator/v10"
 	//"JobBuddy/config"
 	"JobBuddy/models/domain"
@@ -156,7 +158,7 @@ func HandleLogin(context *gin.Context) {
 		return
 	}
 
-	checkedUser, _ := services.GetUser(types.ByEmail, loginForm.Email)
+	checkedUser, errChecked := services.GetUser(types.ByEmail, loginForm.Email)
 
 	if checkedUser != nil && checkedUser.Email == "" {
 
@@ -165,6 +167,12 @@ func HandleLogin(context *gin.Context) {
 		})
 		return
 
+	} else if errChecked != nil {
+
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": errChecked.Error(), // consider another err message for internal server err
+		})
+		return
 	}
 
 	errCompare := bcrypt.CompareHashAndPassword([]byte(checkedUser.Password), []byte(loginForm.Password))
@@ -176,6 +184,8 @@ func HandleLogin(context *gin.Context) {
 		})
 		return
 	}
+
+	loginForm.Id = checkedUser.ID
 
 	token, err := services.GenerateJWTToken(loginForm)
 

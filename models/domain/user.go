@@ -19,5 +19,5 @@ type User struct {
 	CreatedAt              time.Time
 	UpdatedAt              time.Time
 
-	JobApplications []JobApplication `gorm:"foreignKey:UserID"`
+	JobApplications []JobApplication `gorm:"foreignKey:UserEmail;references:Email"`
 }

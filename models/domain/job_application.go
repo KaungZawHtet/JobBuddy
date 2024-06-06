@@ -11,7 +11,7 @@ import (
 // gorm.Model definition
 type JobApplication struct {
 	ID                uuid.UUID               `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	UserID            uuid.UUID               `gorm:"type:uuid;not null" json:"user_id"`
+	UserEmail         string                  `gorm:"type:varchar(255);not null" json:"user_email"`
 	CompanyName       string                  `gorm:"type:varchar(255);not null"`
 	Position          string                  `gorm:"type:varchar(255);not null"`
 	ApplicationStatus types.ApplicationStatus `gorm:"type:varchar(50);not null"`
@@ -20,6 +20,4 @@ type JobApplication struct {
 	Notes             string                  `gorm:"type:text"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
-
-	User User `gorm:"foreignKey:UserID"`
 }

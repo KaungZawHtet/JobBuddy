@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/google/uuid"
+
 type UserRegistration struct {
 	UserName     string `json:"user_name" binding:"required"`
 	FirstName    string `json:"first_name" binding:"required"`
@@ -10,6 +12,7 @@ type UserRegistration struct {
 }
 
 type UserLogin struct {
+	Id         uuid.UUID
 	Password   string `json:"password" binding:"required"`
 	Email      string `json:"email" binding:"required,email"`
 	RememberMe bool   `json:"remember_me" binding:"required"`

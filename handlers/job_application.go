@@ -1,13 +1,15 @@
 package handlers
 
 import (
+	"JobBuddy/models/dto"
 	"JobBuddy/services"
 	"JobBuddy/types"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func HandleMyApplicationsList(context *gin.Context) {
@@ -66,8 +68,8 @@ func HandleMyApplicationsList(context *gin.Context) {
 
 	email := mapClaims["email"].(string)
 
-	// Call the GetAllMyJobApplication service
-	applications, err := services.GetAllMyJobApplication(email, search, applicationStatus, startDate, endDate, limit, offset)
+	// Call the ListAllMyJobApplication service
+	applications, err := services.ListAllMyJobApplication(email, search, applicationStatus, startDate, endDate, limit, offset)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -75,5 +77,49 @@ func HandleMyApplicationsList(context *gin.Context) {
 
 	// Return the list of applications in JSON format
 	context.JSON(http.StatusOK, gin.H{"message": "This is your applications", "data": applications})
+
+}
+
+func HandleMyApplicationCreation(context *gin.Context) {
+
+	var jobAppForm dto.JobApplicationForm
+
+	errBindJson := context.ShouldBindJSON(&jobAppForm)
+
+	if errBindJson != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": errBindJson.Error()})
+		return
+	}
+
+	claims, exists := context.Get("mapClaims")
+
+	if !exists {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Unauthorization detected",
+		})
+	}
+
+	mapClaims, ok := claims.(jwt.MapClaims)
+
+	if !ok {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Cliam Error",
+		})
+	}
+
+	email := mapClaims["email"].(string)
+
+	err := services.CreateMyApplicationForm(email, jobAppForm)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Successfully created your Job Application",
+		"data":    jobAppForm,
+	})
 
 }
