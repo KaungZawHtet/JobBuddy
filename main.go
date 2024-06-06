@@ -33,7 +33,7 @@ func main() {
 
 	})
 
-	userApiGroup := router.Group("/api/user")
+	userApiGroup := router.Group("/api/users")
 	{
 		userApiGroup.POST("/register", handlers.HandleRegister)
 		userApiGroup.GET("/email-confirm", handlers.HandleEmailConfirmation)
@@ -42,6 +42,13 @@ func main() {
 		userApiGroup.GET("/google-auth-callback", handlers.HandleGoogleAuthCallback)
 
 		userApiGroup.GET("/claims-checker", middlewares.Authenticator(), handlers.HandleClaimsChecker)
+
+	}
+
+	JobApplicationApiGroup := router.Group("/api/job-applications")
+	{
+
+		JobApplicationApiGroup.GET("/", middlewares.Authenticator(), handlers.HandleMyApplicationsList)
 
 	}
 
