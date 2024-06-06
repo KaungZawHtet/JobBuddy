@@ -128,7 +128,70 @@ func HandleMyJobApplicationDeletion(context *gin.Context) {
 
 	id := context.Param("id")
 
-	errDelete := services.DeleteMyJobApplication(id)
+	claims, exists := context.Get("mapClaims")
+
+	if !exists {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Unauthorization detected",
+		})
+	}
+
+	mapClaims, ok := claims.(jwt.MapClaims)
+
+	if !ok {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Cliam Error",
+		})
+	}
+
+	email := mapClaims["email"].(string)
+
+	errDelete := services.DeleteMyJobApplication(email, id)
+
+	if errDelete != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": errDelete.Error(),
+		})
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Successfully deleted your Job Application",
+	})
+
+}
+
+func HandleMyJobApplicationPatch(context *gin.Context) {
+
+	id := context.Param("id")
+
+	var jobAppForm dto.JobApplicationForm
+
+	errBindJson := context.ShouldBindJSON(&jobAppForm)
+
+	if errBindJson != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": errBindJson.Error()})
+		return
+	}
+
+	claims, exists := context.Get("mapClaims")
+
+	if !exists {
+		context.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Unauthorization detected",
+		})
+	}
+
+	mapClaims, ok := claims.(jwt.MapClaims)
+
+	if !ok {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Cliam Error",
+		})
+	}
+
+	userEmail := mapClaims["email"].(string)
+
+	errDelete := services.PatchMyJobApplication(userEmail, id, jobAppForm)
 
 	if errDelete != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{

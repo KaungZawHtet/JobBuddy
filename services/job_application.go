@@ -11,14 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
-func ListAllMyJobApplication(email string, search string, status types.ApplicationStatus, startDate time.Time, endDate time.Time, limit int, offset int) ([]domain.JobApplication, error) {
+func ListAllMyJobApplication(userEmail string, search string, status types.ApplicationStatus, startDate time.Time, endDate time.Time, limit int, offset int) ([]domain.JobApplication, error) {
 	var jobApps []domain.JobApplication
 	db, errDbAccess := config.AcessDB()
 	if errDbAccess != nil {
 		return nil, errDbAccess
 	}
 
-	query := db.Where("user_email = ?", email)
+	query := db.Where("user_email = ?", userEmail)
 
 	if limit > 0 {
 		query = query.Limit(limit)
@@ -73,16 +73,23 @@ func CreateMyJobApplicationForm(email string, dto dto.JobApplicationForm) error 
 
 }
 
-func DeleteMyJobApplication(id string) error {
+func DeleteMyJobApplication(userEmail string, id string) error {
 	db, errDbAccess := config.AcessDB()
 	if errDbAccess != nil {
 		return errDbAccess
 	}
 
+	var checkedJobApp domain.JobApplication
+
 	// Convert string ID to UUID
 	uid, err := uuid.Parse(id)
 	if err != nil {
 		return fmt.Errorf("invalid UUID format: %v", err)
+	}
+	db.Where(" id = ?", uid).Find(&checkedJobApp)
+
+	if checkedJobApp.UserEmail != userEmail {
+		return fmt.Errorf("unauthorized to access the data")
 	}
 
 	// Perform the delete operation
@@ -97,4 +104,41 @@ func DeleteMyJobApplication(id string) error {
 	}
 
 	return nil
+}
+
+func PatchMyJobApplication(userEmail string, id string, dto dto.JobApplicationForm) error {
+
+	var jobApp domain.JobApplication
+
+	db, errDbAccess := config.AcessDB()
+	if errDbAccess != nil {
+		return errDbAccess
+	}
+
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return fmt.Errorf("invalid UUID format: %v", err)
+	}
+
+	db.Where("id = ?", uid).Find(&jobApp)
+
+	if jobApp.UserEmail != userEmail {
+		return fmt.Errorf("unauthorized to access the record")
+	}
+
+	jobApp.CompanyName = dto.CompanyName
+	jobApp.ApplicationDate = dto.ApplicationDate
+	jobApp.ApplicationStatus = dto.ApplicationStatus
+	jobApp.Notes = dto.Notes
+	jobApp.Position = dto.Position
+	jobApp.ResponseDate = dto.ResponseDate
+
+	result := db.Save(&jobApp)
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("unable to path the Job Application with ID: %v", id)
+	}
+
+	return nil
+
 }
