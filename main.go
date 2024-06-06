@@ -50,6 +50,7 @@ func main() {
 
 		JobApplicationApiGroup.GET("", middlewares.Authenticator(), handlers.HandleMyApplicationsList)
 		JobApplicationApiGroup.POST("", middlewares.Authenticator(), handlers.HandleMyApplicationCreation)
+		JobApplicationApiGroup.DELETE("/:id", middlewares.Authenticator(), handlers.HandleMyJobApplicationDeletion)
 
 	}
 

@@ -5,7 +5,10 @@ import (
 	"JobBuddy/models/domain"
 	"JobBuddy/models/dto"
 	"JobBuddy/types"
+	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func ListAllMyJobApplication(email string, search string, status types.ApplicationStatus, startDate time.Time, endDate time.Time, limit int, offset int) ([]domain.JobApplication, error) {
@@ -46,7 +49,7 @@ func ListAllMyJobApplication(email string, search string, status types.Applicati
 	return jobApps, nil
 }
 
-func CreateMyApplicationForm(email string, dto dto.JobApplicationForm) error {
+func CreateMyJobApplicationForm(email string, dto dto.JobApplicationForm) error {
 
 	db, errDbAccess := config.AcessDB()
 
@@ -68,4 +71,30 @@ func CreateMyApplicationForm(email string, dto dto.JobApplicationForm) error {
 
 	return nil
 
+}
+
+func DeleteMyJobApplication(id string) error {
+	db, errDbAccess := config.AcessDB()
+	if errDbAccess != nil {
+		return errDbAccess
+	}
+
+	// Convert string ID to UUID
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return fmt.Errorf("invalid UUID format: %v", err)
+	}
+
+	// Perform the delete operation
+	result := db.Delete(&domain.JobApplication{}, uid)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// Check if any record was deleted
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no record found with ID: %v", id)
+	}
+
+	return nil
 }

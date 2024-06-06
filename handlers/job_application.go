@@ -109,7 +109,7 @@ func HandleMyApplicationCreation(context *gin.Context) {
 
 	email := mapClaims["email"].(string)
 
-	err := services.CreateMyApplicationForm(email, jobAppForm)
+	err := services.CreateMyJobApplicationForm(email, jobAppForm)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
@@ -120,6 +120,24 @@ func HandleMyApplicationCreation(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Successfully created your Job Application",
 		"data":    jobAppForm,
+	})
+
+}
+
+func HandleMyJobApplicationDeletion(context *gin.Context) {
+
+	id := context.Param("id")
+
+	errDelete := services.DeleteMyJobApplication(id)
+
+	if errDelete != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": errDelete.Error(),
+		})
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Successfully deleted your Job Application",
 	})
 
 }
