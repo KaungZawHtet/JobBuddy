@@ -12,7 +12,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"gorm.io/gorm"
@@ -192,4 +194,32 @@ func FetchGoogleUserProfile(accessToken string) (dto.UserProfile, error) {
 	}
 
 	return profile, nil
+}
+
+func GetClaimVar(by types.Field, context *gin.Context) (interface{}, error) {
+
+	claims, exists := context.Get("mapClaims")
+
+	if !exists {
+
+		return "", fmt.Errorf("unauthorization detected")
+	}
+
+	mapClaims, ok := claims.(jwt.MapClaims)
+
+	if !ok {
+		return "", fmt.Errorf("claims error")
+	}
+
+	switch by {
+	case types.ByEmail:
+
+		return mapClaims["email"].(string), nil
+
+	case types.ByID:
+
+		return mapClaims["id"].(uuid.UUID), nil
+
+	}
+	return "", fmt.Errorf("some err happened")
 }

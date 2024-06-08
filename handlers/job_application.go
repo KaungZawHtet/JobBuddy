@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func HandleMyApplicationsList(context *gin.Context) {
@@ -50,26 +49,17 @@ func HandleMyApplicationsList(context *gin.Context) {
 		offset = 0
 	}
 
-	claims, exists := context.Get("mapClaims")
+	userEmail, errClaim := services.GetClaimVar(types.ByEmail, context)
 
-	if !exists {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorization detected",
-		})
+	if errClaim != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": errClaim.Error()})
+		return
 	}
 
-	mapClaims, ok := claims.(jwt.MapClaims)
-
-	if !ok {
-		context.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Cliam Error",
-		})
-	}
-
-	email := mapClaims["email"].(string)
+	strUserEmail := userEmail.(string)
 
 	// Call the ListAllMyJobApplication service
-	applications, err := services.ListAllMyJobApplication(email, search, applicationStatus, startDate, endDate, limit, offset)
+	applications, err := services.ListAllMyJobApplication(strUserEmail, search, applicationStatus, startDate, endDate, limit, offset)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -91,25 +81,16 @@ func HandleMyApplicationCreation(context *gin.Context) {
 		return
 	}
 
-	claims, exists := context.Get("mapClaims")
+	userEmail, errClaim := services.GetClaimVar(types.ByEmail, context)
 
-	if !exists {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorization detected",
-		})
+	if errClaim != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": errClaim.Error()})
+		return
 	}
 
-	mapClaims, ok := claims.(jwt.MapClaims)
+	strUserEmail := userEmail.(string)
 
-	if !ok {
-		context.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Cliam Error",
-		})
-	}
-
-	email := mapClaims["email"].(string)
-
-	err := services.CreateMyJobApplicationForm(email, jobAppForm)
+	err := services.CreateMyJobApplicationForm(strUserEmail, jobAppForm)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
@@ -128,25 +109,16 @@ func HandleMyJobApplicationDeletion(context *gin.Context) {
 
 	id := context.Param("id")
 
-	claims, exists := context.Get("mapClaims")
+	userEmail, errClaim := services.GetClaimVar(types.ByEmail, context)
 
-	if !exists {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorization detected",
-		})
+	if errClaim != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": errClaim.Error()})
+		return
 	}
 
-	mapClaims, ok := claims.(jwt.MapClaims)
+	strUserEmail := userEmail.(string)
 
-	if !ok {
-		context.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Cliam Error",
-		})
-	}
-
-	email := mapClaims["email"].(string)
-
-	errDelete := services.DeleteMyJobApplication(email, id)
+	errDelete := services.DeleteMyJobApplication(strUserEmail, id)
 
 	if errDelete != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
@@ -173,25 +145,16 @@ func HandleMyJobApplicationPatch(context *gin.Context) {
 		return
 	}
 
-	claims, exists := context.Get("mapClaims")
+	userEmail, errClaim := services.GetClaimVar(types.ByEmail, context)
 
-	if !exists {
-		context.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Unauthorization detected",
-		})
+	if errClaim != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": errClaim.Error()})
+		return
 	}
 
-	mapClaims, ok := claims.(jwt.MapClaims)
+	strUserEmail := userEmail.(string)
 
-	if !ok {
-		context.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Cliam Error",
-		})
-	}
-
-	userEmail := mapClaims["email"].(string)
-
-	errDelete := services.PatchMyJobApplication(userEmail, id, jobAppForm)
+	errDelete := services.PatchMyJobApplication(strUserEmail, id, jobAppForm)
 
 	if errDelete != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
